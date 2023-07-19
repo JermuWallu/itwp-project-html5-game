@@ -55,6 +55,8 @@ class PlayGame extends Phaser.Scene {
         this.load.image("gameOver", "assets/game_Over.png")
         this.load.image("background", "assets/background.png")
         // this.load.image("sideWall", "assets/sidewall.png")
+        this.load.audio("boing","assets/boing.mp3")
+        this.load.audio("starSound","assets/starSound.mp3")
     }
 
     create() {
@@ -93,6 +95,10 @@ class PlayGame extends Phaser.Scene {
         // user input?
         this.cursors = this.input.keyboard.createCursorKeys()
 
+        // Sounds
+        this.boing = this.sound.add("boing", {loop: false, volume: .5})
+        this.starSound = this.sound.add("starSound", {loop: false, volume: .5})
+
         // add ground
         this.addGround()
 
@@ -130,6 +136,7 @@ class PlayGame extends Phaser.Scene {
         star.disableBody(true, true)
         this.score += 100
         this.scoreText.setText(this.score)
+        this.starSound.play()
     }
     
     update() {
@@ -154,7 +161,7 @@ class PlayGame extends Phaser.Scene {
             let relativePos = game.input.mousePointer.x-this.player.body.x
             this.player.body.velocity.x = relativePos / 1
             
-
+            this.boing.play()
         }
 
         // debug logging
