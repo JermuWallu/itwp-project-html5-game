@@ -19,8 +19,14 @@ window.onload = function() {
         scale: {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
-            // width: 800,
-            // height: 1000,
+
+            width: 800,
+            height: 1000,
+
+            max: {
+                width: 800,
+                height: 1000,
+            }
         },
         pixelArt: true,
         physics: {
@@ -71,6 +77,14 @@ class PlayGame extends Phaser.Scene {
             allowGravity: false
             
         })
+
+        // moving ground group
+        this.groundGroup = this.physics.add.group({
+            immovable: false,
+            allowGravity: false
+            
+        })
+
         console.log(this.groundGroup)
 
         // Player and its properties
@@ -105,13 +119,13 @@ class PlayGame extends Phaser.Scene {
         this.addGround()
 
 
-        // // trigger for adding ground infinetly
-        // this.triggerTimer = this.time.addEvent({
-        //     callback: this.addGround,
-        //     callbackScope: this,
-        //     delay: 700,
-        //     loop: true
-        // })
+        // trigger for adding ground infinetly
+        this.triggerTimer = this.time.addEvent({
+            callback: this.moveGround,
+            callbackScope: this,
+            delay: 10,
+            loop: true
+        })
     }
     // add ground objects to the scene
     addGround() {
@@ -134,11 +148,18 @@ class PlayGame extends Phaser.Scene {
         }
     }
 
+    // star collecting function
     collectStar(player, star) {
         star.destroy()
         this.score += 100
         this.scoreText.setText(this.score)
         this.starSound.play()
+    }
+
+    // function to move selected platforms
+
+    moveGround() {
+
     }
     
     update() {
@@ -155,7 +176,7 @@ class PlayGame extends Phaser.Scene {
         }
         */ 
 
-        // controls
+        // PC controls
         if(this.cursors.space.isDown && this.player.body.touching.down) {
             // vertical velocity
             this.player.body.velocity.y = -gameOptions.playerGravity / 1.4
@@ -167,10 +188,14 @@ class PlayGame extends Phaser.Scene {
             this.boing.play()
         }
 
-        // touchpad
+        // touchpad controls
         this.input.on('pointerup', function(pointer){
-            var touchX = pointer.x;
-            var touchY = pointer.y;
+
+            // check if the character is touching the ground
+            if (!this.player.body.touching.down) {
+                return
+            }
+
             // vertical velocity
             this.player.body.velocity.y = -gameOptions.playerGravity / 1.4
     
@@ -187,22 +212,19 @@ class PlayGame extends Phaser.Scene {
             console.log("body y: " + this.player.body.y)
             console.log(this.player.getBottomCenter().y)
             console.log("alpha: " + this.player.alpha)
-        }
 
-        // debug generation 
-        if (this.cursors.left.isDown) {
-            this.scene.start("PlayGame")
+            console.log(game.config)
         }
-
 
 
         // game over
         if(this.player.getBottomCenter().y >= game.config.height) {
             this.add.image(game.config.width/2,game.config.height/2,"gameOver")
-            this.scene.pause() 
-
-            // debug only
-            this.scene.start("PlayGame")
+            this.player.destroy()
+            this.input.on('pointerup', function(pointer){
+                this.scene.destroy()
+                this.scene.start("PlayGame")
+            }, this)
         }
 
         // next stage
