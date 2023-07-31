@@ -19,8 +19,8 @@ window.onload = function() {
         scale: {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
-            width: 800,
-            height: 1000,
+            // width: 800,
+            // height: 1000,
         },
         pixelArt: true,
         physics: {
@@ -29,10 +29,12 @@ window.onload = function() {
                 gravity: {
                     y: 0
                 },
-                debug: true
+                debug: true // enable/disable debug mode
             }
         },
-        scene: PlayGame
+        scene: PlayGame,
+
+        input: "enabled"
     }
 
     game = new Phaser.Game(gameConfig)
@@ -133,7 +135,7 @@ class PlayGame extends Phaser.Scene {
     }
 
     collectStar(player, star) {
-        star.disableBody(true, true)
+        star.destroy()
         this.score += 100
         this.scoreText.setText(this.score)
         this.starSound.play()
@@ -153,6 +155,7 @@ class PlayGame extends Phaser.Scene {
         }
         */ 
 
+        // controls
         if(this.cursors.space.isDown && this.player.body.touching.down) {
             // vertical velocity
             this.player.body.velocity.y = -gameOptions.playerGravity / 1.4
@@ -163,6 +166,20 @@ class PlayGame extends Phaser.Scene {
             
             this.boing.play()
         }
+
+        // touchpad
+        this.input.on('pointerup', function(pointer){
+            var touchX = pointer.x;
+            var touchY = pointer.y;
+            // vertical velocity
+            this.player.body.velocity.y = -gameOptions.playerGravity / 1.4
+    
+            // horizontal velocity 
+            let relativePos = pointer.x-this.player.body.x
+            this.player.body.velocity.x = relativePos / 1
+            
+            this.boing.play()
+        }, this);
 
         // debug logging
         if (this.cursors.down.isDown) {
