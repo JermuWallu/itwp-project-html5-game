@@ -80,7 +80,7 @@ class PlayGame extends Phaser.Scene {
 
         // moving ground group
         this.groundGroup = this.physics.add.group({
-            immovable: false,
+            immovable: true,
             allowGravity: false
             
         })
